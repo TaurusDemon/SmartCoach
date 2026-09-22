@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: smartcoach-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartcoach_db
+    username: postgres
+    password: secretpassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Hibernate creará automáticamente la tabla 'users'
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+      operationsSorter: method # Ordena los endpoints por método HTTP (GET, POST, etc.)
+    api-docs:
+      path: /v3/api-docs
