@@ -19,12 +19,17 @@ public class UserEntity {
     @Column(nullable = false)
     private String email;
 
+    @Column(name="password", nullable = false)
+    private String password;
+
     public UserEntity() {
     }
-    public UserEntity(UUID id, String name, String email) {
+
+    public UserEntity(UUID id, String name, String email, String  password) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {
@@ -37,6 +42,12 @@ public class UserEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setId(UUID id) {

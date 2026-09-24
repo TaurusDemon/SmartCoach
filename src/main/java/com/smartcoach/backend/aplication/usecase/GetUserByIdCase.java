@@ -1,6 +1,6 @@
 package com.smartcoach.backend.aplication.usecase;
 
-import com.smartcoach.backend.domain.expection.UserNotFoundException;
+import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.UserRepository;
 

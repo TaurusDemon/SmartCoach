@@ -1,7 +1,7 @@
 package com.smartcoach.backend.infrastructure.rest.dto;
 
-import com.smartcoach.backend.domain.model.ActivityLevel;
-import com.smartcoach.backend.domain.model.FitnessGoal;
+import com.smartcoach.backend.domain.vo.ActivityLevel;
+import com.smartcoach.backend.domain.vo.FitnessGoal;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

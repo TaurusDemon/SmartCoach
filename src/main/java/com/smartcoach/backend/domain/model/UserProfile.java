@@ -1,8 +1,6 @@
 package com.smartcoach.backend.domain.model;
 
-import com.smartcoach.backend.domain.vo.Age;
-import com.smartcoach.backend.domain.vo.Height;
-import com.smartcoach.backend.domain.vo.Weight;
+import com.smartcoach.backend.domain.vo.*;
 
 import java.util.Objects;
 import java.util.UUID;
