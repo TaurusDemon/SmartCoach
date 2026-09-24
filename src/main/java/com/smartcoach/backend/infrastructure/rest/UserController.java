@@ -51,7 +51,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
-        User resgisteredUser = registerUserCase.execute(registerUserRequest.name(), registerUserRequest.email());
+        User resgisteredUser = registerUserCase.execute(registerUserRequest.name(), registerUserRequest.email(), registerUserRequest.password());
 
         UserResponse response = new UserResponse(resgisteredUser.getId(), resgisteredUser.getName(), resgisteredUser.getEmail().value());
 
@@ -85,7 +85,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody RegisterUserRequest registerUserRequest){
-        User modifiedUser = updateUserCase.execute(id, registerUserRequest.name(), registerUserRequest.email());
+        User modifiedUser = updateUserCase.execute(id, registerUserRequest.name(), registerUserRequest.email(),registerUserRequest.password());
         UserResponse response = new UserResponse(modifiedUser.getId(), modifiedUser.getName(), modifiedUser.getEmail().value());
 
         return  ResponseEntity.status(HttpStatus.OK).body(response);

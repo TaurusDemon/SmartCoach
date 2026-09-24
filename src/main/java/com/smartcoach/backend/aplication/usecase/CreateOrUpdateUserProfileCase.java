@@ -1,8 +1,8 @@
 package com.smartcoach.backend.aplication.usecase;
 
-import com.smartcoach.backend.domain.expection.UserNotFoundException;
-import com.smartcoach.backend.domain.model.ActivityLevel;
-import com.smartcoach.backend.domain.model.FitnessGoal;
+import com.smartcoach.backend.domain.exception.UserNotFoundException;
+import com.smartcoach.backend.domain.vo.ActivityLevel;
+import com.smartcoach.backend.domain.vo.FitnessGoal;
 import com.smartcoach.backend.domain.model.UserProfile;
 import com.smartcoach.backend.domain.port.UserProfileRepository;
 import com.smartcoach.backend.domain.port.UserRepository;

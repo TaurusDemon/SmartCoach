@@ -1,4 +1,4 @@
-package com.smartcoach.backend.domain.expection;
+package com.smartcoach.backend.domain.exception;
 
 import java.util.UUID;
 

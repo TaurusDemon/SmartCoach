@@ -33,19 +33,21 @@ class RegisterUserCaseTest {
         // Arrange (Preparación)
         String name = "Carlos";
         String email = "carlos@ejemplo.com";
+        String password = "contraseña123";
 
         // Simulamos que el repositorio devuelve la misma entidad que recibe al guardar
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act (Ejecución)
-        User result = registerUserCase.execute(name, email);
+        User result = registerUserCase.execute(name, email,password);
 
         // Assert (Verificación con AssertJ)
         assertThat(result).isNotNull();
         assertThat(result.getId()).isNotNull();
         assertThat(result.getName()).isEqualTo("Carlos");
         assertThat(result.getEmail().value()).isEqualTo("carlos@ejemplo.com");
+        assertThat(result.getPassword().value()).isEqualTo("contraseña123");
 
         // Capturamos el objeto real enviado al repositorio para verificar la interacción
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -54,6 +56,7 @@ class RegisterUserCaseTest {
         User capturedUser = userCaptor.getValue();
         assertThat(capturedUser.getName()).isEqualTo("Carlos");
         assertThat(capturedUser.getEmail().value()).isEqualTo("carlos@ejemplo.com");
+        assertThat(capturedUser.getPassword().value()).isEqualTo("contraseña123");
     }
 
     @Test
@@ -62,11 +65,29 @@ class RegisterUserCaseTest {
         // Arrange
         String name = "Ana";
         String invalidEmail = "email-sin-arroba";
+        String password = "contraseña123";
 
         // Act & Assert
-        assertThatThrownBy(() -> registerUserCase.execute(name, invalidEmail))
+        assertThatThrownBy(() -> registerUserCase.execute(name, invalidEmail,password))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("El email no tiene un formato válido");
+
+        // Verificamos que al fallar la validación, NUNCA se llegó a llamar al repositorio
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción y NO guardar en repositorio si el email es inválido")
+    void shouldThrowExceptionWhenPasswordIsInvalid() {
+        // Arrange
+        String name = "Ana";
+        String invalidEmail = "email@arroba.com";
+        String password = "hola";
+
+        // Act & Assert
+        assertThatThrownBy(() -> registerUserCase.execute(name, invalidEmail,password))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("La contraseña debe tener al menos 8 caracteres");
 
         // Verificamos que al fallar la validación, NUNCA se llegó a llamar al repositorio
         verify(userRepository, never()).save(any());

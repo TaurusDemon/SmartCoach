@@ -1,7 +1,7 @@
 package com.smartcoach.backend.infrastructure.rest.exception;
 
-import com.smartcoach.backend.domain.expection.UserAlreadyExistsExpection;
-import com.smartcoach.backend.domain.expection.UserNotFoundException;
+import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
+import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.infrastructure.rest.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

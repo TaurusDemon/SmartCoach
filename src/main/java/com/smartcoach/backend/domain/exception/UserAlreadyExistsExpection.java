@@ -1,4 +1,4 @@
-package com.smartcoach.backend.domain.expection;
+package com.smartcoach.backend.domain.exception;
 
 public class UserAlreadyExistsExpection extends RuntimeException {
     public UserAlreadyExistsExpection(String email) {
