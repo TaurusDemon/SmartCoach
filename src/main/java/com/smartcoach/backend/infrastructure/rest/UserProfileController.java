@@ -1,6 +1,6 @@
 package com.smartcoach.backend.infrastructure.rest;
 
-import com.smartcoach.backend.aplication.usecase.CreateOrUpdateUserProfileCase;
+import com.smartcoach.backend.application.usecase.CreateOrUpdateUserProfileCase;
 import com.smartcoach.backend.domain.model.UserProfile;
 import com.smartcoach.backend.infrastructure.rest.dto.*;
 import io.swagger.v3.oas.annotations.Operation;

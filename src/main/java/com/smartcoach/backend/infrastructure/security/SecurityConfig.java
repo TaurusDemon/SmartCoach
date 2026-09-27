@@ -9,10 +9,17 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private JwtAuthenticatorFilter jwtAuthenticatorFilter;
+
+    public  SecurityConfig(JwtAuthenticatorFilter jwtAuthenticatorFilter) {
+        this.jwtAuthenticatorFilter = jwtAuthenticatorFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,10 +43,11 @@ public class SecurityConfig {
                         // Rutas públicas de Autenticación (Login, Registro)
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
-                        // Por ahora, permitimos temporalmente las demás rutas para que pruebes mientras montamos el filtro JWT
-                        // (Más adelante cambiaremos .permitAll() por .authenticated())
-                        .anyRequest().permitAll()
-                );
+                        //protegemos endpoints
+                        .anyRequest().authenticated()
+                )
+                // Colocamos nuestro filtro antes del filtro estándar de Spring
+                .addFilterBefore(jwtAuthenticatorFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

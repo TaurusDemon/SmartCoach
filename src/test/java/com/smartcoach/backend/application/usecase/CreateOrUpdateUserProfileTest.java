@@ -8,7 +8,6 @@ import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.ActivityLevel;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.FitnessGoal;
-import com.smartcoach.backend.aplication.usecase.CreateOrUpdateUserProfileCase;
 import com.smartcoach.backend.domain.vo.Password;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

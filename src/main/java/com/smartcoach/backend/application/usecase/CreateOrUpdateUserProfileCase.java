@@ -1,4 +1,4 @@
-package com.smartcoach.backend.aplication.usecase;
+package com.smartcoach.backend.application.usecase;
 
 import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.vo.ActivityLevel;

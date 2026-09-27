@@ -1,22 +1,21 @@
-package com.smartcoach.backend.aplication.usecase;
+package com.smartcoach.backend.application.usecase;
 
 import com.smartcoach.backend.domain.exception.UserNotFoundException;
-import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.UserRepository;
 
 import java.util.UUID;
 
-public class GetUserByIdCase {
-    private final UserRepository userRepository;
+public class DeleteUserCase {
+    private UserRepository userRepository;
 
-    public GetUserByIdCase(UserRepository userRepository){
+    public  DeleteUserCase(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User execute(UUID id){
+    public void execute(UUID id){
         if(userRepository.findById(id).isEmpty()){
             throw new UserNotFoundException(id);
         }
-        return userRepository.findById(id).get();
+        userRepository.deleteById(id);
     }
 }
