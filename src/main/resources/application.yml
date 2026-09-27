@@ -23,3 +23,7 @@ spring:
       operationsSorter: method # Ordena los endpoints por método HTTP (GET, POST, etc.)
     api-docs:
       path: /v3/api-docs
+
+jwt:
+  secret: SmartCoachKeySecretSuperSecureForJWTTokenGeneration2026!
+  expiration-ms: 86400000

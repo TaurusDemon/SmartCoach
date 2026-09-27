@@ -1,9 +1,9 @@
 package com.smartcoach.backend.infrastructure.rest;
 
-import com.smartcoach.backend.aplication.usecase.DeleteUserCase;
-import com.smartcoach.backend.aplication.usecase.GetUserByIdCase;
-import com.smartcoach.backend.aplication.usecase.RegisterUserCase;
-import com.smartcoach.backend.aplication.usecase.UpdateUserCase;
+import com.smartcoach.backend.application.usecase.DeleteUserCase;
+import com.smartcoach.backend.application.usecase.GetUserByIdCase;
+import com.smartcoach.backend.application.usecase.RegisterUserCase;
+import com.smartcoach.backend.application.usecase.UpdateUserCase;
 import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.infrastructure.rest.dto.ErrorResponse;
 import com.smartcoach.backend.infrastructure.rest.dto.RegisterUserRequest;
@@ -15,9 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

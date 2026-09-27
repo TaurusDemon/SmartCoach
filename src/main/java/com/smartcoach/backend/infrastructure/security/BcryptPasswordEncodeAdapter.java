@@ -1,7 +1,6 @@
 package com.smartcoach.backend.infrastructure.security;
 
 import com.smartcoach.backend.domain.port.PasswordEncoderPort;
-import jakarta.persistence.Column;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 

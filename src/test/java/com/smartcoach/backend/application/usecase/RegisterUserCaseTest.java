@@ -1,6 +1,5 @@
 package com.smartcoach.backend.application.usecase;
 
-import com.smartcoach.backend.aplication.usecase.RegisterUserCase;
 import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

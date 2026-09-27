@@ -1,4 +1,4 @@
-package com.smartcoach.backend.aplication.usecase;
+package com.smartcoach.backend.application.usecase;
 
 import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
 import com.smartcoach.backend.domain.model.User;
