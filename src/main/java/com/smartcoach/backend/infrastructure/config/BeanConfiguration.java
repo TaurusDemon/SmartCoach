@@ -1,10 +1,7 @@
 package com.smartcoach.backend.infrastructure.config;
 
 import com.smartcoach.backend.application.usecase.*;
-import com.smartcoach.backend.domain.port.PasswordEncoderPort;
-import com.smartcoach.backend.domain.port.TokenProviderPort;
-import com.smartcoach.backend.domain.port.UserProfileRepository;
-import com.smartcoach.backend.domain.port.UserRepository;
+import com.smartcoach.backend.domain.port.*;
 import com.smartcoach.backend.infrastructure.rest.AuthController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,5 +34,15 @@ public class BeanConfiguration {
     @Bean
     public AuthenticateUserUseCase authenticateUserUseCase(UserRepository userRepository, PasswordEncoderPort passwordEncoderPort, TokenProviderPort tokenProviderPort) {
         return new AuthenticateUserUseCase(userRepository, passwordEncoderPort, tokenProviderPort);
+    }
+
+    @Bean
+    public CreateRoutineUseCase createRoutineUseCase(RoutineRepository routineRepository) {
+        return new CreateRoutineUseCase(routineRepository);
+    }
+
+    @Bean
+    public GetRoutinesByUserIdCase getRoutinesByUserIdCase(RoutineRepository routineRepository, UserRepository userRepository) {
+        return new GetRoutinesByUserIdCase(routineRepository,userRepository);
     }
 }

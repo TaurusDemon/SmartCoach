@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # Hibernate creará automáticamente la tabla 'users'
+      ddl-auto: update # Hibernate creará automáticamente las tablas
     show-sql: true
     properties:
       hibernate:
