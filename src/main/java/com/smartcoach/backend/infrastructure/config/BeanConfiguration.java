@@ -1,6 +1,7 @@
 package com.smartcoach.backend.infrastructure.config;
 
 import com.smartcoach.backend.application.usecase.*;
+import com.smartcoach.backend.domain.model.UserProfile;
 import com.smartcoach.backend.domain.port.*;
 import com.smartcoach.backend.infrastructure.rest.AuthController;
 import org.springframework.context.annotation.Bean;
@@ -44,5 +45,15 @@ public class BeanConfiguration {
     @Bean
     public GetRoutinesByUserIdCase getRoutinesByUserIdCase(RoutineRepository routineRepository, UserRepository userRepository) {
         return new GetRoutinesByUserIdCase(routineRepository,userRepository);
+    }
+
+    @Bean
+    public GetUserProfileByIdCase getUserProfileByIdCase(UserProfileRepository userProfileRepository) {
+        return new GetUserProfileByIdCase(userProfileRepository);
+    }
+
+    @Bean
+    public GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase(AiCoachPort aiCoachPort, UserProfileRepository userProfileRepository, RoutineRepository routineRepository) {
+        return new GenerateWorkoutRoutineUseCase(aiCoachPort, userProfileRepository, routineRepository);
     }
 }

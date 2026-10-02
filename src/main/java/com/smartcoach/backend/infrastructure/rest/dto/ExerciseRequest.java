@@ -1,6 +1,5 @@
 package com.smartcoach.backend.infrastructure.rest.dto;
 
-import com.smartcoach.backend.domain.vo.ExcerciseDetails;
 import com.smartcoach.backend.domain.vo.ExerciseCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

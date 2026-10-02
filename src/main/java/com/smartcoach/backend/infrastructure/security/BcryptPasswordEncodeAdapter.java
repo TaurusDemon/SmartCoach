@@ -10,6 +10,7 @@ public class BcryptPasswordEncodeAdapter implements PasswordEncoderPort {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public String encode(String rawPassword) {
+
         return passwordEncoder.encode(rawPassword);
     }
 

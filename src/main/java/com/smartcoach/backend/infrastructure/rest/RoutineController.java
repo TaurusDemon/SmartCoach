@@ -1,9 +1,11 @@
 package com.smartcoach.backend.infrastructure.rest;
 
 import com.smartcoach.backend.application.usecase.CreateRoutineUseCase;
+import com.smartcoach.backend.application.usecase.GenerateWorkoutRoutineUseCase;
 import com.smartcoach.backend.application.usecase.GetRoutinesByUserIdCase;
 import com.smartcoach.backend.domain.model.Routine;
 import com.smartcoach.backend.infrastructure.rest.dto.*;
+import com.smartcoach.backend.infrastructure.security.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,10 +29,12 @@ import java.util.UUID;
 public class RoutineController {
     private final CreateRoutineUseCase createRoutineUseCase;
     private final GetRoutinesByUserIdCase getRoutinesByUserIdCase;
+    private final GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase;
 
-    public RoutineController(CreateRoutineUseCase createRoutineUseCase, GetRoutinesByUserIdCase getRoutinesByUserIdCase) {
+    public RoutineController(CreateRoutineUseCase createRoutineUseCase, GetRoutinesByUserIdCase getRoutinesByUserIdCase, GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase) {
         this.createRoutineUseCase = createRoutineUseCase;
         this.getRoutinesByUserIdCase = getRoutinesByUserIdCase;
+        this.generateWorkoutRoutineUseCase = generateWorkoutRoutineUseCase;
     }
 
     @PostMapping
@@ -44,7 +48,7 @@ public class RoutineController {
     public ResponseEntity<RoutineResponse> createRoutine(@RequestBody @Valid CreateRoutineRequest createRoutineRequest) {
 
         List<CreateRoutineUseCase.ExerciseInput> exerciseInputList = createRoutineRequest.exercises().stream().map(e -> new CreateRoutineUseCase.ExerciseInput(e.name(),e.category(),e.sets(),e.reps(),e.restSeconds())).toList();
-        Routine routine = createRoutineUseCase.execute(getAuthenticatedUserId(),createRoutineRequest.name(), createRoutineRequest.goal(), exerciseInputList);
+        Routine routine = createRoutineUseCase.execute(AuthenticatedUser.getAuthenticatedUserId(),createRoutineRequest.name(), createRoutineRequest.goal(), exerciseInputList);
         RoutineResponse response = RoutineResponse.fromDomain(routine);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -58,14 +62,19 @@ public class RoutineController {
     })
     @GetMapping()
     public ResponseEntity<List<RoutineResponse>> getRoutines() {
-        List<Routine> routines = getRoutinesByUserIdCase.execute(getAuthenticatedUserId());
+
+        List<Routine> routines = getRoutinesByUserIdCase.execute(AuthenticatedUser.getAuthenticatedUserId());
         List<RoutineResponse> routineResponseList = routines.stream().map(r -> RoutineResponse.fromDomain(r)).toList();
 
         return ResponseEntity.status(HttpStatus.OK).body(routineResponseList);
     }
 
-    public UUID getAuthenticatedUserId(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (UUID) authentication.getPrincipal();
+    @PostMapping("/generate")
+    public ResponseEntity<RoutineResponse> generateRoutine(@RequestBody(required = false) String additionalPreferences) {
+
+        Routine routine = generateWorkoutRoutineUseCase.execute(AuthenticatedUser.getAuthenticatedUserId(), additionalPreferences);
+        RoutineResponse response = RoutineResponse.fromDomain(routine);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

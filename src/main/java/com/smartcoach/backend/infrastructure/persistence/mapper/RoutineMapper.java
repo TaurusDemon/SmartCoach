@@ -2,7 +2,7 @@ package com.smartcoach.backend.infrastructure.persistence.mapper;
 
 import com.smartcoach.backend.domain.model.Exercise;
 import com.smartcoach.backend.domain.model.Routine;
-import com.smartcoach.backend.domain.vo.ExcerciseDetails;
+import com.smartcoach.backend.domain.vo.ExerciseDetails;
 import com.smartcoach.backend.infrastructure.persistence.entity.ExerciseEntity;
 import com.smartcoach.backend.infrastructure.persistence.entity.RoutineEntity;
 
@@ -32,7 +32,7 @@ public class RoutineMapper {
                 routineEntity.getUserId(),
                 routineEntity.getName(),
                 routineEntity.getRoutineGoal(),
-                routineEntity.getExerciseList().stream().map(e -> new Exercise(e.getId(),e.getName(), e.getCategory(), new ExcerciseDetails(e.getSets(), e.getReps(), e.getRestSeconds()))).toList(),
+                routineEntity.getExerciseList().stream().map(e -> new Exercise(e.getId(),e.getName(), e.getCategory(), new ExerciseDetails(e.getSets(), e.getReps(), e.getRestSeconds()))).toList(),
                 routineEntity.getCreatedAt());
     }
 }
