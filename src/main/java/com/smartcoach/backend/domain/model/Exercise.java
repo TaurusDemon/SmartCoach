@@ -1,6 +1,6 @@
 package com.smartcoach.backend.domain.model;
 
-import com.smartcoach.backend.domain.vo.ExcerciseDetails;
+import com.smartcoach.backend.domain.vo.ExerciseDetails;
 import com.smartcoach.backend.domain.vo.ExerciseCategory;
 
 import java.util.Objects;
@@ -10,9 +10,9 @@ public class Exercise {
     private final UUID id;
     private final String name;
     private final ExerciseCategory exerciseCategory;
-    private final ExcerciseDetails exerciseDetails;
+    private final ExerciseDetails exerciseDetails;
 
-    public Exercise(UUID id, String name, ExerciseCategory exerciseCategory, ExcerciseDetails exerciseDetails) {
+    public Exercise(UUID id, String name, ExerciseCategory exerciseCategory, ExerciseDetails exerciseDetails) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.exerciseCategory = Objects.requireNonNull(exerciseCategory);
@@ -31,7 +31,7 @@ public class Exercise {
         return exerciseCategory;
     }
 
-    public ExcerciseDetails getExerciseDetails() {
+    public ExerciseDetails getExerciseDetails() {
         return exerciseDetails;
     }
 }

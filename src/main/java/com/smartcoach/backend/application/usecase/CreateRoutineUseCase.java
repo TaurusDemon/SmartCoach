@@ -3,7 +3,7 @@ package com.smartcoach.backend.application.usecase;
 import com.smartcoach.backend.domain.model.Exercise;
 import com.smartcoach.backend.domain.model.Routine;
 import com.smartcoach.backend.domain.port.RoutineRepository;
-import com.smartcoach.backend.domain.vo.ExcerciseDetails;
+import com.smartcoach.backend.domain.vo.ExerciseDetails;
 import com.smartcoach.backend.domain.vo.ExerciseCategory;
 import com.smartcoach.backend.domain.vo.RoutineGoal;
 
@@ -20,7 +20,7 @@ public class CreateRoutineUseCase {
 
     public Routine execute(UUID userId, String name, RoutineGoal routineGoal, List<ExerciseInput> exerciseInput){
 
-        List<Exercise> exerciseList = exerciseInput.stream().map(input -> new Exercise(UUID.randomUUID(),input.name(),input.exerciseCategory(),new ExcerciseDetails(input.sets(), input.reps(), input.restSeconds()))).toList();
+        List<Exercise> exerciseList = exerciseInput.stream().map(input -> new Exercise(UUID.randomUUID(),input.name(),input.exerciseCategory(),new ExerciseDetails(input.sets(), input.reps(), input.restSeconds()))).toList();
 
         Routine routine = new Routine(UUID.randomUUID(), userId, name, routineGoal,exerciseList,LocalDateTime.now());
 

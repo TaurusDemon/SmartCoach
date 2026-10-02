@@ -1,7 +1,7 @@
 package com.smartcoach.backend.domain.vo;
 
-public record ExcerciseDetails(int sets, int reps, int restSeconds) {
-    public ExcerciseDetails{
+public record ExerciseDetails(int sets, int reps, int restSeconds) {
+    public ExerciseDetails {
         if (sets <= 0)
             throw new IllegalArgumentException("Las series no pueden ser 0");
         if(reps <= 0)
