@@ -1,6 +1,7 @@
 package com.smartcoach.backend.application.usecase;
 
 import com.smartcoach.backend.domain.model.User;
+import com.smartcoach.backend.domain.port.PasswordEncoderPort;
 import com.smartcoach.backend.domain.port.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,14 +17,17 @@ class RegisterUserCaseTest {
 
     private UserRepository userRepository;
     private RegisterUserCase registerUserCase;
+    private PasswordEncoderPort passwordEncoderPort;
 
     @BeforeEach
     void setUp() {
         // 1. Creación del Mock (aislamos la dependencia)
         userRepository = mock(UserRepository.class);
+        passwordEncoderPort = mock(PasswordEncoderPort.class);
+
 
         // 2. Inyección manual en la SUT (System Under Test)
-        registerUserCase = new RegisterUserCase(userRepository);
+        registerUserCase = new RegisterUserCase(userRepository, passwordEncoderPort);
     }
 
     @Test
@@ -38,15 +42,17 @@ class RegisterUserCaseTest {
         when(userRepository.save(any(User.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
+        when(passwordEncoderPort.encode(password)).thenReturn("hola1234");
+
         // Act (Ejecución)
-        User result = registerUserCase.execute(name, email,password);
+        User result = registerUserCase.execute(name, email, password);
 
         // Assert (Verificación con AssertJ)
         assertThat(result).isNotNull();
         assertThat(result.getId()).isNotNull();
         assertThat(result.getName()).isEqualTo("Carlos");
         assertThat(result.getEmail().value()).isEqualTo("carlos@ejemplo.com");
-        assertThat(result.getPassword().value()).isEqualTo("contraseña123");
+        assertThat(result.getPassword().value()).isEqualTo("hola1234");
 
         // Capturamos el objeto real enviado al repositorio para verificar la interacción
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -55,7 +61,7 @@ class RegisterUserCaseTest {
         User capturedUser = userCaptor.getValue();
         assertThat(capturedUser.getName()).isEqualTo("Carlos");
         assertThat(capturedUser.getEmail().value()).isEqualTo("carlos@ejemplo.com");
-        assertThat(capturedUser.getPassword().value()).isEqualTo("contraseña123");
+        assertThat(capturedUser.getPassword().value()).isEqualTo("hola1234");
     }
 
     @Test

@@ -24,6 +24,15 @@ spring:
     api-docs:
       path: /v3/api-docs
 
+  ai:
+    google:
+      genai:
+        api-key: AQ.Ab8RN6LDqjkg6k4IYK4-E7pPTJZy7wWPl_97iBhI-2cYptSTSQ
+        chat:
+          options:
+            model: gemini-3.8-flash
+            temperature: 0.7
+
 jwt:
   secret: SmartCoachKeySecretSuperSecureForJWTTokenGeneration2026!
   expiration-ms: 86400000
