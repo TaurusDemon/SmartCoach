@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Registro y login", description = "Endpoints para la gestión del registro y login")
 public class AuthController {
 
     private final RegisterUserCase registerUserCase;
@@ -41,7 +43,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Login del usuario", description = "Login de un usuario con email y contraseña que devuelve un token")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario logado exitosamente",
+            @ApiResponse(responseCode = "200", description = "Usuario logado exitosamente",
                     content = @Content(schema = @Schema(implementation = UserResponse.class))),
             @ApiResponse(responseCode = "400", description = "Formato de datos o email inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
