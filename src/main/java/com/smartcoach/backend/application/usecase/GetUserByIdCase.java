@@ -14,9 +14,6 @@ public class GetUserByIdCase {
     }
 
     public User execute(UUID id){
-        if(userRepository.findById(id).isEmpty()){
-            throw new UserNotFoundException(id);
-        }
-        return userRepository.findById(id).get();
+        return userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
     }
 }

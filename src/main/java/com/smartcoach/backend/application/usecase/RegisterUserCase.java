@@ -6,7 +6,7 @@ import com.smartcoach.backend.domain.port.PasswordEncoderPort;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.Password;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.smartcoach.backend.domain.vo.PasswordHash;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -24,12 +24,12 @@ public class RegisterUserCase {
 
         Email email = new Email(rawEmail);
         String encodedPassword = passwordEncoderPort.encode(rawPassword);
-        Password password = new Password(encodedPassword);
+        Password password = new Password(rawPassword);
 
         if(userRepository.findByEmail(email).isPresent()){
             throw new UserAlreadyExistsExpection(email.toString());
         }
-        User user = new User(UUID.randomUUID(), name, email, password);
+        User user = new User(UUID.randomUUID(), name, email, new PasswordHash(encodedPassword));
 
         return userRepository.save(user);
     }

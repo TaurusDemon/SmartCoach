@@ -1,13 +1,10 @@
 package com.smartcoach.backend.application.usecase;
 
-import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.exception.UserProfileNotFoundException;
 import com.smartcoach.backend.domain.model.Routine;
-import com.smartcoach.backend.domain.model.UserProfile;
 import com.smartcoach.backend.domain.port.AiCoachPort;
 import com.smartcoach.backend.domain.port.RoutineRepository;
 import com.smartcoach.backend.domain.port.UserProfileRepository;
-import com.smartcoach.backend.infrastructure.rest.dto.RoutineResponse;
 
 import java.util.UUID;
 
@@ -26,10 +23,8 @@ public class GenerateWorkoutRoutineUseCase {
 
     public Routine execute(UUID userId, String additionalPreferences){
 
-        if(userProfileRepository.findByUserId(userId).isEmpty()){
-            throw new UserProfileNotFoundException(userId);
-        }
-        Routine routine = aiCoachPort.generateRoutine(userProfileRepository.findByUserId(userId).get(), additionalPreferences);
+        Routine routine = aiCoachPort.generateRoutine(userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserProfileNotFoundException(userId)), additionalPreferences);
 
         return routineRepository.save(routine);
     }
