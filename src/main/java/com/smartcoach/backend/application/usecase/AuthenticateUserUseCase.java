@@ -1,6 +1,5 @@
 package com.smartcoach.backend.application.usecase;
 
-import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.PasswordEncoderPort;
 import com.smartcoach.backend.domain.port.TokenProviderPort;
@@ -20,10 +19,7 @@ public class AuthenticateUserUseCase {
 
     public String execute(String email, String password){
 
-        if(userRepository.findByEmail(new  Email(email)).isEmpty()){
-            throw new IllegalArgumentException("El email no existe en el sistema");
-        }
-        User user = userRepository.findByEmail(new Email(email)).get();
+        User user = userRepository.findByEmail(new Email(email)).orElseThrow(()-> new IllegalArgumentException("El email no existe en el sistema"));
 
         if(!passwordEncoderPort.matches(password, user.getPassword().value())){
             throw new IllegalArgumentException("Password incorrecto");

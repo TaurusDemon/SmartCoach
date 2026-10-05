@@ -12,6 +12,7 @@ public class GetRoutinesByUserIdCase {
 
     private final RoutineRepository routineRepository;
     private final UserRepository userRepository;
+
     public GetRoutinesByUserIdCase(RoutineRepository routineRepository, UserRepository userRepository) {
         this.routineRepository = routineRepository;
         this.userRepository = userRepository;

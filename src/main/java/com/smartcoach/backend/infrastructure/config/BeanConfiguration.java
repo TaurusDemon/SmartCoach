@@ -19,8 +19,8 @@ public class BeanConfiguration {
         return new GetUserByIdCase(userRepository);
     }
     @Bean
-    public UpdateUserCase updateUserCase(UserRepository userRepository) {
-        return new UpdateUserCase(userRepository);
+    public UpdateUserCase updateUserCase(UserRepository userRepository, PasswordEncoderPort passwordEncoderPort) {
+        return new UpdateUserCase(userRepository, passwordEncoderPort);
     }
 
     @Bean

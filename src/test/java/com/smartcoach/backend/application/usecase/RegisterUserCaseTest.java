@@ -89,6 +89,8 @@ class RegisterUserCaseTest {
         String invalidEmail = "email@arroba.com";
         String password = "hola";
 
+        when(passwordEncoderPort.encode(password)).thenReturn("hola");
+
         // Act & Assert
         assertThatThrownBy(() -> registerUserCase.execute(name, invalidEmail,password))
                 .isInstanceOf(IllegalArgumentException.class)
