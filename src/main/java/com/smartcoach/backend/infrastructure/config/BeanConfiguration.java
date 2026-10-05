@@ -56,4 +56,14 @@ public class BeanConfiguration {
     public GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase(AiCoachPort aiCoachPort, UserProfileRepository userProfileRepository, RoutineRepository routineRepository) {
         return new GenerateWorkoutRoutineUseCase(aiCoachPort, userProfileRepository, routineRepository);
     }
+
+    @Bean
+    public CreateWeightLogUseCase createWeightLogUseCase(WeightLogRepository weightLogRepository, UserProfileRepository userProfileRepository) {
+        return new CreateWeightLogUseCase(weightLogRepository,userProfileRepository);
+    }
+
+    @Bean
+    public GetWeightLogHistoryUseCase getWeightLogHistoryUseCase(WeightLogRepository weightLogRepository, UserProfileRepository userProfileRepository) {
+        return new GetWeightLogHistoryUseCase(weightLogRepository,userProfileRepository);
+    }
 }
