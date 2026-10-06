@@ -1,0 +1,30 @@
+
+name: SmartCoach CI - Build & Test
+
+on:
+  push:
+    branches: ["master", "desarrollo"]
+  pull_request:
+    branches: ["master", "desarrollo"]
+
+jobs:
+  build-and-test:
+    name: Build Java 17 & Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compilar con maven
+        run: mvn clean compile
+
+      - name: Ejecutar Tests Unitarios
+        run: mvn test
