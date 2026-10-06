@@ -24,7 +24,7 @@ public class RegisterUserCase {
 
         Email email = new Email(rawEmail);
         String encodedPassword = passwordEncoderPort.encode(rawPassword);
-        Password password = new Password(rawPassword);
+        new Password(rawPassword);
 
         if(userRepository.findByEmail(email).isPresent()){
             throw new UserAlreadyExistsExpection(email.toString());

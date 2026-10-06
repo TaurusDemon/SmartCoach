@@ -1,7 +1,6 @@
 package com.smartcoach.backend.domain.model;
 
 import com.smartcoach.backend.domain.vo.Email;
-import com.smartcoach.backend.domain.vo.Password;
 import com.smartcoach.backend.domain.vo.PasswordHash;
 
 import java.util.Objects;
