@@ -1,0 +1,16 @@
+spring:
+  ai:
+    google:
+      genai:
+        # Sustituye a GEMINI_API_KEY para que `mvn test` funcione en cualquier maquina
+        # sin exportar variables de entorno. Nunca usar un valor real aqui.
+        api-key: dummy-api-key-for-tests
+        chat:
+          options:
+            model: gemini-3.8-flash
+            temperature: 0.7
+
+# Clave HMAC >= 32 bytes para que Keys.hmacShaKeyFor(...) no lance WeakKeyException.
+jwt:
+  secret: UnitTestOnlySecretWithAtLeast32BytesOfEntropy!
+  expiration-ms: 3600000
