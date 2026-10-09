@@ -23,9 +23,9 @@ public class JpaUserRepositoryAdapter implements UserRepository {
     @Override
     public User save(User user) {
         //Convertimos la entidad dominio a JPA
-        UserEntity userEntitytoSave = UserPersistenceMapper.toEntity(user);
+        UserEntity userEntityToSave = UserPersistenceMapper.toEntity(user);
         //Guardamos en BBDD mediante save
-        UserEntity userSaved = springDataUserRepository.save(userEntitytoSave);
+        UserEntity userSaved = springDataUserRepository.save(userEntityToSave);
 
         //Convertimos de vuelta al modelo de Dominio
         return UserPersistenceMapper.toDomain(userSaved);
