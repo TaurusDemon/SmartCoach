@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: ["master", "desarrollo"]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-test:
     name: Build Java 17 & Run Tests
@@ -26,5 +30,13 @@ jobs:
       - name: Compilar con maven
         run: mvn clean compile
 
-      - name: Ejecutar Tests Unitarios
+      - name: Ejecutar Tests Unitarios + Integracion
         run: mvn test
+
+      - name: Iniciar sesión en GitHub Container Registry (GHCR)
+        if: github.ref == 'refs/head/master' && github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
