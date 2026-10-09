@@ -19,9 +19,26 @@ public class JpaUserProfileRepositoryAdapter implements UserProfileRepository {
     }
     @Override
     public UserProfile save(UserProfile userProfile) {
-        UserProfileEntity userProfileEntityToSave = UserProfilePersistenceMapper.toEntity(userProfile);
+        UserProfileEntity datos = UserProfilePersistenceMapper.toEntity(userProfile);
 
-        UserProfileEntity userProfileEntitySaved = springDataUserProfileRepository.save(userProfileEntityToSave);
+        // Upsert explicito. El mapper deja el @Id (userId) a null porque con
+        // @MapsId Hibernate lo deriva de la relacion con UserEntity, y eso hace
+        // que Spring Data considere SIEMPRE la entidad como "nueva" y ejecute un
+        // INSERT: al actualizar un perfil existente se violaba la PK.
+        // Solucion: si ya existe, recuperamos la entidad GESTIONADA por JPA y le
+        // copiamos los campos (Hibernate hara UPDATE); si no existe, insertamos.
+        UserProfileEntity entidadAGuardar = springDataUserProfileRepository.findById(userProfile.getUserId())
+                .map(existente -> {
+                    existente.setAge(datos.getAge());
+                    existente.setWeight(datos.getWeight());
+                    existente.setHeight(datos.getHeight());
+                    existente.setActivityLevel(datos.getActivityLevel());
+                    existente.setFitnessGoal(datos.getFitnessGoal());
+                    return existente;
+                })
+                .orElse(datos);
+
+        UserProfileEntity userProfileEntitySaved = springDataUserProfileRepository.save(entidadAGuardar);
 
         return UserProfilePersistenceMapper.toDomain(userProfileEntitySaved);
     }
