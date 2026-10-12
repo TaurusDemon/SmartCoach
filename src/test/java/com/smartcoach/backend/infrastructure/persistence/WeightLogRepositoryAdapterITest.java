@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class WeightLogRepositoryAdapterIT extends AbstractIntegrationTest {
+public class WeightLogRepositoryAdapterITest extends AbstractIntegrationTest {
 
     @Autowired
     private WeightLogRepository weightLogRepository;

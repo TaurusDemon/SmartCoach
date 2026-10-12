@@ -54,7 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @ActiveProfiles("test")
 @SpringBootTest
-public class UserRepositoryAdapterIT extends AbstractIntegrationTest {
+public class UserRepositoryAdapterITest extends AbstractIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;

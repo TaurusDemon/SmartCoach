@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
-public class RoutineRepositoryAdapterIT extends AbstractIntegrationTest {
+public class RoutineRepositoryAdapterITest extends AbstractIntegrationTest {
 
     @Autowired
     private RoutineRepository routineRepository;
