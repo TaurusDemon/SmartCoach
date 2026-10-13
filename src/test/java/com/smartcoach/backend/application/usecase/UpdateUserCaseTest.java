@@ -1,5 +1,6 @@
 package com.smartcoach.backend.application.usecase;
 
+import com.smartcoach.backend.domain.exception.ForbiddenOperationException;
 import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
 import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.model.User;
@@ -7,7 +8,6 @@ import com.smartcoach.backend.domain.port.PasswordEncoderPort;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
-import com.smartcoach.backend.domain.vo.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class UpdateUserCaseTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act (When)
-        User resultado = updateUserCase.execute(userId, "Carlos Gomez Perez", "carlos.nuevo@ejemplo.com", RAW_PASSWORD);
+        User resultado = updateUserCase.execute(userId, userId,"USER","Carlos Gomez Perez", "carlos.nuevo@ejemplo.com", RAW_PASSWORD);
 
         // Assert (Then)
         assertThat(resultado).isNotNull();
@@ -91,7 +91,7 @@ class UpdateUserCaseTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act (When)
-        User resultado = updateUserCase.execute(userId, "Carlos", "carlos@ejemplo.com", RAW_PASSWORD);
+        User resultado = updateUserCase.execute(userId, userId,"USER","Carlos Gomez Perez", "carlos.nuevo@ejemplo.com", RAW_PASSWORD);
 
         // Assert (Then)
         assertThat(resultado.getPassword().value()).isEqualTo(ENCODED_PASSWORD);
@@ -113,12 +113,12 @@ class UpdateUserCaseTest {
         when(userRepository.findByEmail(new Email("carlos@ejemplo.com"))).thenReturn(Optional.of(usuarioExistente));
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act (When)
-        User resultado = updateUserCase.execute(userId, "Carlos Gomez", "carlos@ejemplo.com", RAW_PASSWORD);
+        // Act (When): se cambia el nombre pero se conserva el email original.
+        User resultado = updateUserCase.execute(userId, userId,"USER","Carlos Gomez Perez", "carlos@ejemplo.com", RAW_PASSWORD);
 
         // Assert (Then)
         assertThat(resultado.getEmail().value()).isEqualTo("carlos@ejemplo.com");
-        assertThat(resultado.getName()).isEqualTo("Carlos Gomez");
+        assertThat(resultado.getName()).isEqualTo("Carlos Gomez Perez");
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -134,7 +134,7 @@ class UpdateUserCaseTest {
                 .thenReturn(Optional.of(usuarioValido(otroUserId)));
 
         // Act & Assert (When & Then)
-        assertThatThrownBy(() -> updateUserCase.execute(userId, "Impostor", "carlos@ejemplo.com", RAW_PASSWORD))
+        assertThatThrownBy(() -> updateUserCase.execute(userId, userId, "USER", "Impostor", "carlos@ejemplo.com", RAW_PASSWORD))
                 .isInstanceOf(UserAlreadyExistsExpection.class)
                 .hasMessageContaining("Ya existe un usuario registrado con el email: Email[value=carlos@ejemplo.com]");
 
@@ -149,7 +149,7 @@ class UpdateUserCaseTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert (When & Then)
-        assertThatThrownBy(() -> updateUserCase.execute(userId, "Carlos", "carlos@ejemplo.com", RAW_PASSWORD))
+        assertThatThrownBy(() -> updateUserCase.execute(userId, userId, "USER", "Carlos", "carlos@ejemplo.com", RAW_PASSWORD))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("Usuario no encontrado con el ID: " + userId);
 
@@ -165,7 +165,7 @@ class UpdateUserCaseTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(usuarioValido(userId)));
 
         // Act & Assert (When & Then): el VO Email falla antes de cifrar la contraseña.
-        assertThatThrownBy(() -> updateUserCase.execute(userId, "Carlos", "email-sin-arroba", RAW_PASSWORD))
+        assertThatThrownBy(() -> updateUserCase.execute(userId, userId, "USER","Carlos", "email-sin-arroba", RAW_PASSWORD))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("El email no tiene un formato válido");
 
@@ -182,9 +182,24 @@ class UpdateUserCaseTest {
         when(passwordEncoderPort.encode("corta")).thenReturn(ENCODED_PASSWORD);
 
         // Act & Assert (When & Then)
-        assertThatThrownBy(() -> updateUserCase.execute(userId, "Carlos", "carlos@ejemplo.com", "corta"))
+        assertThatThrownBy(() -> updateUserCase.execute(userId,userId, "USER", "Carlos", "carlos@ejemplo.com", "corta"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("La contraseña debe tener al menos 8 caracteres");
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Debe lanzar ForbiddenOperationException y no guardar cuando quiere modificar otro usuario sin ser ADMIN")
+    void deberiaLanzarExcepcionDeProhibicion_cuandoQuiereModificarOtroUsuarioSinAdmin() {
+        // Arrange (Given)
+        UUID userId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+
+        // Act & Assert (When & Then)
+        assertThatThrownBy(() -> updateUserCase.execute(userId,targetId, "USER", "Carlos", "carlos@ejemplo.com", "corta"))
+                .isInstanceOf(ForbiddenOperationException.class)
+                .hasMessageContaining("No tienes permisos para hacer esta operacion");
 
         verify(userRepository, never()).save(any(User.class));
     }
