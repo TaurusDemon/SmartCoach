@@ -5,6 +5,7 @@ import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
+import com.smartcoach.backend.domain.vo.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,12 +49,13 @@ class DeleteUserCaseTest {
     void deberiaEliminarElUsuario_cuandoElIdExisteEnElRepositorio() {
         // Arrange (Given)
         UUID userId = UUID.randomUUID();
+        String role = "USER";
         User usuarioExistente = usuarioValido(userId, "Carlos Gomez", "carlos@ejemplo.com");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(usuarioExistente));
 
         // Act (When)
-        assertThatCode(() -> deleteUserCase.execute(userId)).doesNotThrowAnyException();
+        assertThatCode(() -> deleteUserCase.execute(userId, role, userId)).doesNotThrowAnyException();
 
         // Assert (Then)
         verify(userRepository, times(1)).findById(userId);
@@ -65,10 +67,11 @@ class DeleteUserCaseTest {
     void deberiaLanzarUserNotFoundException_cuandoElIdNoExiste() {
         // Arrange (Given)
         UUID userId = UUID.randomUUID();
+        String role = "USER";
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert (When & Then)
-        assertThatThrownBy(() -> deleteUserCase.execute(userId))
+        assertThatThrownBy(() -> deleteUserCase.execute(userId,role,userId))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("Usuario no encontrado con el ID: " + userId);
 

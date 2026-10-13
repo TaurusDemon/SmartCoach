@@ -27,12 +27,13 @@ public class JwtService implements TokenProviderPort {
     }
 
     //Genera un Token JWT con el ID y Email del usuario
-    public String generateToken(UUID userId, String email) {
+    public String generateToken(UUID userId, String email, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder().subject(userId.toString())
                 .claim("email",email)
+                .claim("role",role)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
@@ -42,6 +43,11 @@ public class JwtService implements TokenProviderPort {
     //Extrae el ID del usuario desde un token
     public String extractUserId(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    //Extrae el Rol del usuario desde un token
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role").toString();
     }
 
     //Compruba si el token es valido y no ha caducado

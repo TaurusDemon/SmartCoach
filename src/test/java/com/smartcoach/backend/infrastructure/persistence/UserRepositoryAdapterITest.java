@@ -4,6 +4,7 @@ import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
+import com.smartcoach.backend.domain.vo.Role;
 import com.smartcoach.backend.infrastructure.AbstractIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

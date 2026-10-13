@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -47,8 +49,12 @@ public class JwtAuthenticatorFilter extends OncePerRequestFilter {
             String userIdStr = jwtService.extractUserId(jwt);
             UUID userId = UUID.fromString(userIdStr);
 
+            String userRole = jwtService.extractRole(jwt);
+
+            var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + userRole));
+
             // 5. Creamos el objeto de autenticación de Spring Security con el UUID del usuario
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, authorities);
 
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

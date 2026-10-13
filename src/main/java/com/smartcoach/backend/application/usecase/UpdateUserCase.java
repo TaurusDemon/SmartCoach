@@ -1,5 +1,6 @@
 package com.smartcoach.backend.application.usecase;
 
+import com.smartcoach.backend.domain.exception.ForbiddenOperationException;
 import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
 import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.model.User;
@@ -8,6 +9,7 @@ import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.Password;
 import com.smartcoach.backend.domain.vo.PasswordHash;
+import com.smartcoach.backend.domain.vo.Role;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -21,7 +23,14 @@ public class UpdateUserCase {
         this.passwordEncoderPort = Objects.requireNonNull(passwordEncoder);
     }
 
-    public User execute(UUID id, String name, String rawEmail, String rawPassword) {
+    public User execute(UUID id, UUID targetId, String role, String name, String rawEmail, String rawPassword) {
+
+        boolean isOwner = id.equals(targetId);
+
+        if(!role.equals(Role.ADMIN.name()) && !isOwner){
+            throw new ForbiddenOperationException();
+        }
+
         if(userRepository.findById(id).isEmpty()){
             throw new UserNotFoundException(id);
         }

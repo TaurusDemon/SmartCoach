@@ -7,6 +7,7 @@ import com.smartcoach.backend.domain.port.PasswordEncoderPort;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
+import com.smartcoach.backend.domain.vo.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

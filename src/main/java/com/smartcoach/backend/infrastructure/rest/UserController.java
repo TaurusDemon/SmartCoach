@@ -8,6 +8,7 @@ import com.smartcoach.backend.domain.model.User;
 import com.smartcoach.backend.infrastructure.rest.dto.ErrorResponse;
 import com.smartcoach.backend.infrastructure.rest.dto.RegisterUserRequest;
 import com.smartcoach.backend.infrastructure.rest.dto.UserResponse;
+import com.smartcoach.backend.infrastructure.security.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,34 +27,14 @@ import java.util.UUID;
 @Tag(name = "Usuarios", description = "Endpoints para la gestión e itinerario de usuarios")
 public class UserController {
 
-    private final RegisterUserCase registerUserCase;
     private final GetUserByIdCase getUserByIdCase;
     private final UpdateUserCase updateUserCase;
     private final DeleteUserCase deleteUserCase;
 
-    public UserController(RegisterUserCase registerUserCase, GetUserByIdCase getUserByIdCase, UpdateUserCase updateUserCase, DeleteUserCase deleteUserCase) {
-        this.registerUserCase = registerUserCase;
+    public UserController (GetUserByIdCase getUserByIdCase, UpdateUserCase updateUserCase, DeleteUserCase deleteUserCase) {
         this.getUserByIdCase = getUserByIdCase;
         this.updateUserCase = updateUserCase;
         this.deleteUserCase = deleteUserCase;
-    }
-
-    @PostMapping
-    @Operation(summary = "Registrar un nuevo usuario", description = "Crea un usuario en el sistema validando que el email no esté duplicado.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente",
-                    content = @Content(schema = @Schema(implementation = UserResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Formato de datos o email inválido",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "El email ya está registrado",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterUserRequest registerUserRequest) {
-        User resgisteredUser = registerUserCase.execute(registerUserRequest.name(), registerUserRequest.email(), registerUserRequest.password());
-
-        UserResponse response = new UserResponse(resgisteredUser.getId(), resgisteredUser.getName(), resgisteredUser.getEmail().value());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
@@ -72,7 +53,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "Actualizar un usuario", description = "Actualiza un usuario en el sistema en en base a su ID pasado como parametro.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuario actualizado correctamente",
@@ -83,7 +64,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UserResponse> update(@PathVariable UUID id, @RequestBody RegisterUserRequest registerUserRequest){
-        User modifiedUser = updateUserCase.execute(id, registerUserRequest.name(), registerUserRequest.email(),registerUserRequest.password());
+        User modifiedUser = updateUserCase.execute(id, AuthenticatedUser.getAuthenticatedUserId(), AuthenticatedUser.getUserRole(), registerUserRequest.name(), registerUserRequest.email(),registerUserRequest.password());
         UserResponse response = new UserResponse(modifiedUser.getId(), modifiedUser.getName(), modifiedUser.getEmail().value());
 
         return  ResponseEntity.status(HttpStatus.OK).body(response);
@@ -97,10 +78,14 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Formato de datos inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "El usuario no existe",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "No tienes permiso",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> delete(@PathVariable UUID id){
-        deleteUserCase.execute(id);
-        return ResponseEntity.noContent().build();
+
+        deleteUserCase.execute(id, AuthenticatedUser.getUserRole(), AuthenticatedUser.getAuthenticatedUserId());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

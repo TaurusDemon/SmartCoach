@@ -1,5 +1,6 @@
 package com.smartcoach.backend.infrastructure.rest.exception;
 
+import com.smartcoach.backend.domain.exception.ForbiddenOperationException;
 import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
 import com.smartcoach.backend.domain.exception.UserNotFoundException;
 import com.smartcoach.backend.domain.exception.UserProfileNotFoundException;
@@ -55,6 +56,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserProfileNotFoundException(UserProfileNotFoundException ex) {
         ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenOperationException(ForbiddenOperationException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN.value(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
 

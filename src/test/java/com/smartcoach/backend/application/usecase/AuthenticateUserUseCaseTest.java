@@ -6,6 +6,7 @@ import com.smartcoach.backend.domain.port.TokenProviderPort;
 import com.smartcoach.backend.domain.port.UserRepository;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
+import com.smartcoach.backend.domain.vo.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class AuthenticateUserUseCaseTest {
 
         when(userRepository.findByEmail(new Email("carlos@ejemplo.com"))).thenReturn(Optional.of(usuario));
         when(passwordEncoderPort.matches("MiClaveSegura123", "contrasena123")).thenReturn(true);
-        when(tokenProviderPort.generateToken(userId, "carlos@ejemplo.com")).thenReturn("jwt.firmado.valido");
+        when(tokenProviderPort.generateToken(userId, "carlos@ejemplo.com","USER")).thenReturn("jwt.firmado.valido");
 
         // Act (When)
         String token = authenticateUserUseCase.execute("carlos@ejemplo.com", "MiClaveSegura123");
@@ -69,7 +70,7 @@ class AuthenticateUserUseCaseTest {
         assertThat(token).isNotNull().isEqualTo("jwt.firmado.valido");
 
         verify(passwordEncoderPort, times(1)).matches("MiClaveSegura123", "contrasena123");
-        verify(tokenProviderPort, times(1)).generateToken(userId, "carlos@ejemplo.com");
+        verify(tokenProviderPort, times(1)).generateToken(userId, "carlos@ejemplo.com","USER");
         // Una sola consulta: el SUT resuelve con Optional.orElseThrow (sin doble findByEmail).
         verify(userRepository, times(1)).findByEmail(new Email("carlos@ejemplo.com"));
     }
@@ -85,9 +86,9 @@ class AuthenticateUserUseCaseTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("El email no existe en el sistema");
 
-        // Invariante de seguridad: sin usuario no se verifica contrasena ni se emite token.
+        // Invariante de seguridad: sin usuario no se verifica contraseña ni se emite token.
         verify(passwordEncoderPort, never()).matches(any(), any());
-        verify(tokenProviderPort, never()).generateToken(any(), any());
+        verify(tokenProviderPort, never()).generateToken(any(), any(),any());
     }
 
     @Test
@@ -105,7 +106,7 @@ class AuthenticateUserUseCaseTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Password incorrecto");
 
-        verify(tokenProviderPort, never()).generateToken(any(), any());
+        verify(tokenProviderPort, never()).generateToken(any(), any(),any());
     }
 
     @Test
@@ -117,7 +118,7 @@ class AuthenticateUserUseCaseTest {
                 .hasMessageContaining("El email no tiene un formato válido");
 
         verify(userRepository, never()).findByEmail(any());
-        verify(tokenProviderPort, never()).generateToken(any(), any());
+        verify(tokenProviderPort, never()).generateToken(any(), any(),any());
     }
 
     /**

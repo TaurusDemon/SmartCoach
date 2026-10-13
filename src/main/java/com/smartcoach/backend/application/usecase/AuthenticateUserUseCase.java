@@ -25,6 +25,6 @@ public class AuthenticateUserUseCase {
             throw new IllegalArgumentException("Password incorrecto");
         }
 
-        return tokenProviderPort.generateToken(user.getId(), user.getEmail().value());
+        return tokenProviderPort.generateToken(user.getId(), user.getEmail().value(), user.getRole().name());
     }
 }

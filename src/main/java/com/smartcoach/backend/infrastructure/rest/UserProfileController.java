@@ -30,7 +30,7 @@ public class UserProfileController {
         this.getUserProfileByIdCase = getUserProfileByIdCase;
     }
 
-    @PostMapping("/{userId}/profile")
+    @PostMapping("/profile")
     @Operation(summary = "Registrar un nuevo perfil de usuario", description = "Crea o actualiza un perfil de usuario en el sistema de un usuario existente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Perfil creado exitosamente",
@@ -38,7 +38,9 @@ public class UserProfileController {
             @ApiResponse(responseCode = "400", description = "Formato de datos inválido",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
-    public ResponseEntity<UserProfileResponse> createUserProfile(@PathVariable UUID userId, @RequestBody CreateUserProfileRequest createUserProfileRequest) {
+    public ResponseEntity<UserProfileResponse> createUserProfile(@RequestBody CreateUserProfileRequest createUserProfileRequest) {
+
+        UUID userId = AuthenticatedUser.getAuthenticatedUserId();
 
         UserProfile userProfile = createOrUpdateUserProfileCase.execute(userId, createUserProfileRequest.age(),
                 createUserProfileRequest.weight(),createUserProfileRequest.height(),

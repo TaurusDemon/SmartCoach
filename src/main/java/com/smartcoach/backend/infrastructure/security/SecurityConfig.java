@@ -43,6 +43,7 @@ public class SecurityConfig {
 
                         // Rutas públicas de Autenticación (Login, Registro)
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         //protegemos endpoints
                         .anyRequest().authenticated()
