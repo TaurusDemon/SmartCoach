@@ -9,19 +9,20 @@ El proyecto sigue una arquitectura hexagonal (ports & adapters): el dominio es i
 - Java 17, Spring Boot 4.1.1 (Web, Data JPA, Validation, Security)
 - PostgreSQL 16 (local con Docker Compose)
 - Spring AI + Gemini (`gemini-3.8-flash`) para la generación de rutinas
-- Spring Security + JWT (jjwt 0.12.5) para autenticación
+- Spring Security + JWT (jjwt 0.12.5) para autenticación y roles `USER` / `ADMIN`
 - Springdoc OpenAPI (Swagger UI en `/swagger-ui.html`)
-- Tests: JUnit 5, Mockito, AssertJ y Testcontainers
+- Tests: JUnit 5, Mockito, AssertJ, H2 (perfil `test`) y Testcontainers
 
 ## Estado actual
 
 Funcional y testeado:
 
 - ✅ Registro, login (JWT) y CRUD de usuarios
+- ✅ Roles `USER` / `ADMIN`: solo el dueño del recurso o un `ADMIN` puede modificar/eliminar un usuario
 - ✅ Perfil físico del usuario (edad, peso, altura, actividad, objetivo)
 - ✅ Creación manual de rutinas y generación con IA (`POST /api/v1/routines/generate`)
 - ✅ Historial de rutinas y registro de pesajes
-- ✅ Manejo global de errores (400 / 401 / 404 / 409)
+- ✅ Manejo global de errores (400 / 401 / 403 / 404 / 409)
 - 🔲 Nutrición (en la hoja de ruta, aún no implementado)
 
 ## Puesta en marcha
@@ -32,11 +33,11 @@ Requisitos: JDK 17, Maven (o usa `./mvnw`) y Docker.
 # 1. Levantar PostgreSQL y pgAdmin
 docker compose up -d
 
-# 2. Variables de entorno necesarias
+# 2. Variables de entorno necesarias para arrancar la app
 #    GEMINI_API_KEY -> clave de la API de Gemini (para /routines/generate)
 #    JWT_SECRET     -> secreto para firmar los tokens (mínimo 32 chars)
-#    En Windows (PowerShell):  $env:GEMINI_API_KEY="..."
-#    En Linux/macOS:           export GEMINI_API_KEY="..."
+#    En Windows (PowerShell):  $env:GEMINI_API_KEY="..." ; $env:JWT_SECRET="..."
+#    En Linux/macOS:           export GEMINI_API_KEY="..." JWT_SECRET="..."
 
 # 3. Arrancar la app
 ./mvnw spring-boot:run
@@ -44,29 +45,54 @@ docker compose up -d
 
 La app queda en `http://localhost:8080` y la documentación interactiva en `http://localhost:8080/swagger-ui.html`.
 
-Si no quieres configurar `GEMINI_API_KEY`, la app funciona igual: hay un `MockAiAdapter` que genera una rutina de ejemplo determinista (se activa por defecto si la key no está disponible).
+> **Nota sobre el arranque sin Gemini:** el adaptador de IA (`GeminiAiAdapter`) es `@Primary` y necesita la key configurada para construirse. Si no tienes una key, pon una *dummy* para poder arrancar (la llamada real a `/routines/generate` fallará); el `MockAiAdapter` del código genera una rutina determinista y sirve como referencia para desarrollo offline si se quiere activar por configuración.
+
+## Autenticación y roles
+
+- Seguridad *stateless* con JWT: `POST /api/v1/auth/login` devuelve un token que el cliente envía como `Authorization: Bearer <token>`.
+- El token incluye los claims `email` y `role`. El `JwtAuthenticatorFilter` los convierte en autoridades de Spring Security (`ROLE_USER` / `ROLE_ADMIN`).
+- `POST /api/v1/auth/register` crea los usuarios con rol **`USER`** por defecto.
+- Los endpoints de perfil, rutinas y pesajes toman el `userId` directamente del token, así que **no hace falta pasarlo como parámetro** (blinda contra IDOR).
+- `PUT` y `DELETE /api/v1/users/{id}` solo están permitidos al **dueño del usuario** o a un **`ADMIN`**; cualquier otro recibe `403 Forbidden`.
+- La ruta `/api/v1/admin/**` está reservada y exige rol `ADMIN` (aún sin endpoints definidos).
+
+> ⚠️ Actualmente no hay endpoint para promocionar a un usuario a `ADMIN`: el primer administrador debe crearse directamente en la base de datos (columna `role` de la tabla `users`).
 
 ## Endpoints principales
 
-Todos bajo `/api/v1`, menos auth que es pública:
+Todos bajo `/api/v1`. Solo `auth` es pública:
 
-| Método | Ruta                            | Descripción                            |
-|--------|---------------------------------|----------------------------------------|
-| POST   | `/auth/register`                | Registrar usuario                      |
-| POST   | `/auth/login`                   | Login, devuelve JWT                    |
-| POST   | `/users`                        | Crear usuario (alternativo)            |
-| GET    | `/users/{id}`                   | Buscar usuario                         |
-| POST   | `/users/{id}`                   | Actualizar usuario                     |
-| DELETE | `/users/{id}`                   | Eliminar usuario                       |
-| POST   | `/users/{userId}/profile`       | Crear/actualizar perfil físico         |
-| GET    | `/users/profile`                | Perfil del usuario autenticado         |
-| POST   | `/routines`                     | Crear rutina manual                    |
-| POST   | `/routines/generate`            | Generar rutina con IA                  |
-| GET    | `/routines`                     | Rutinas del usuario autenticado        |
-| POST   | `/weighlog`                     | Registrar pesaje                       |
-| GET    | `/weighlog`                     | Historial de pesajes                   |
+### Autenticación (pública)
 
-Los endpoints de perfil, rutinas y pesajes cogen el `userId` directamente del token JWT (header `Authorization: Bearer <token>`), así que no hace falta pasarlo como parámetro.
+| Método | Ruta               | Descripción                                  |
+|--------|--------------------|----------------------------------------------|
+| POST   | `/auth/register`   | Registrar usuario (rol `USER` por defecto)   |
+| POST   | `/auth/login`      | Login, devuelve el JWT                       |
+
+### Usuarios y perfil (autenticado)
+
+| Método | Ruta                 | Descripción                     | Permiso           |
+|--------|----------------------|---------------------------------|-------------------|
+| GET    | `/users/{id}`        | Buscar usuario por id           | Autenticado       |
+| PUT    | `/users/{id}`        | Actualizar usuario              | Dueño o ADMIN     |
+| DELETE | `/users/{id}`        | Eliminar usuario                | Dueño o ADMIN     |
+| GET    | `/users`             | Perfil del usuario autenticado  | Autenticado       |
+| POST   | `/users/profile`     | Crear/actualizar perfil físico  | Autenticado       |
+
+### Rutinas (autenticado)
+
+| Método | Ruta                 | Descripción                          |
+|--------|----------------------|--------------------------------------|
+| POST   | `/routines`          | Crear rutina manual                  |
+| GET    | `/routines`          | Rutinas del usuario autenticado      |
+| POST   | `/routines/generate` | Generar rutina con IA (body opcional con preferencias) |
+
+### Pesajes (autenticado)
+
+| Método | Ruta          | Descripción                |
+|--------|---------------|----------------------------|
+| POST   | `/weighlog`   | Registrar pesaje           |
+| GET    | `/weighlog`   | Historial de pesajes       |
 
 ## Tests
 
@@ -74,7 +100,10 @@ Los endpoints de perfil, rutinas y pesajes cogen el `userId` directamente del to
 ./mvnw test
 ```
 
-Hay tests unitarios de los casos de uso (con mocks) y tests de integración (`*IT`) contra un PostgreSQL real levantado con Testcontainers. Estos últimos necesitan Docker funcionando.
+- **Unitarios** de los casos de uso (Mockito) y de los Value Objects (AssertJ).
+- **Test de contexto** (`BackendApplicationTests`) con el perfil `test`: usa una base H2 en memoria y claves *dummy*, por lo que **no requiere variables de entorno**.
+- **Integración** (`*IT`) de la capa de persistencia contra un PostgreSQL real levantado con **Testcontainers**; estos necesitan Docker funcionando.
+- Todo corre de forma automática en GitHub Actions (`.github/workflows/ci.yml`).
 
 ## Estructura
 
@@ -92,7 +121,11 @@ src/main/java/com/smartcoach/backend/
 
 - `ddl-auto: update` en `application.yml`: Hibernate crea/actualiza las tablas solo. Ok para desarrollo, pero es mejor usar migraciones (Flyway/Liquibase) antes de ir a producción.
 - En `docker-compose.yml` también se levanta pgAdmin en `http://localhost:5050` (admin@smartcoach.com / adminpassword) por si quieres inspeccionar la base.
-- Las credenciales de la base están hardcodeadas en el compose. No apto para producción.
+- Las credenciales de la base (PostgreSQL y pgAdmin) están hardcodeadas en el compose y en `application.yml` (solo desarrollo). **No apto para producción.**
+- La sincronización de esquema (`ddl-auto`) **no añade constraints `UNIQUE`** a tablas ya existentes: en una base creada antes del `unique = true` de `users.email` hay que aplicar la restricción a mano:
+  ```sql
+  ALTER TABLE users ADD CONSTRAINT uq_users_email UNIQUE (email);
+  ```
 
 ## Documentación
 

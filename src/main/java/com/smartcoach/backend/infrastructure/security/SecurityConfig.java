@@ -37,8 +37,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs",
-                                "/api/v1/users"
+                                "/v3/api-docs"
                         ).permitAll()
 
                         // Rutas públicas de Autenticación (Login, Registro)
