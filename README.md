@@ -117,15 +117,6 @@ src/main/java/com/smartcoach/backend/
 └── BackendApplication.java
 ```
 
-## Notas
-
-- `ddl-auto: update` en `application.yml`: Hibernate crea/actualiza las tablas solo. Ok para desarrollo, pero es mejor usar migraciones (Flyway/Liquibase) antes de ir a producción.
-- En `docker-compose.yml` también se levanta pgAdmin en `http://localhost:5050` (admin@smartcoach.com / adminpassword) por si quieres inspeccionar la base.
-- Las credenciales de la base (PostgreSQL y pgAdmin) están hardcodeadas en el compose y en `application.yml` (solo desarrollo). **No apto para producción.**
-- La sincronización de esquema (`ddl-auto`) **no añade constraints `UNIQUE`** a tablas ya existentes: en una base creada antes del `unique = true` de `users.email` hay que aplicar la restricción a mano:
-  ```sql
-  ALTER TABLE users ADD CONSTRAINT uq_users_email UNIQUE (email);
-  ```
 
 ## Documentación
 
