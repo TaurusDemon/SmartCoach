@@ -1,6 +1,6 @@
 # Smart Coach AI - Backend
 
-API REST para la generación personalizada de rutinas de entrenamiento y seguimiento nutricional mediante IA. El backend recoge el perfil físico del usuario (edad, peso, altura, objetivo...), y a partir de ahí genera rutinas con Gemini y guarda el historial de entrenamiento y de pesajes.
+API REST para la generación personalizada de rutinas de entrenamiento y seguimiento de pesajes mediante IA. El backend recoge el perfil físico del usuario (edad, peso, altura, objetivo...), y a partir de ahí genera rutinas con Gemini y guarda el historial de entrenamiento y de pesajes.
 
 El proyecto sigue una arquitectura hexagonal (ports & adapters): el dominio es independiente de Spring y de JPA. En `AGENTS.md` y `docs/ARCHITECTURE.md` están las reglas que seguimos al tocar el código.
 
