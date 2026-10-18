@@ -32,4 +32,12 @@ public class JpaWeightLogRepositoryAdapter implements WeightLogRepository {
 
         return weightLogEntityList.stream().map(WeightLogMapper :: toDomain).toList();
     }
+
+    @Override
+    public List<WeightLog> findLastByUserId(UUID id, Integer limit) {
+
+        List<WeightLogEntity> weightLogEntityList = springDataWeightLogRepository.findLastByUserId(id,limit);
+        return weightLogEntityList.stream().map(WeightLogMapper :: toDomain).toList();
+
+    }
 }

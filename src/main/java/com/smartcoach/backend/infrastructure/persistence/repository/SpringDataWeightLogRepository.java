@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface SpringDataWeightLogRepository extends JpaRepository<WeightLogEntity, UUID> {
 
     List<WeightLogEntity> findByUserIdOrderByLogDateDesc(UUID id);
+    List<WeightLogEntity> findLastByUserId(UUID id, Integer limit);
 }

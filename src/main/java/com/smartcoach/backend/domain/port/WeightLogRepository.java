@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface WeightLogRepository {
     WeightLog save(WeightLog weightLog);
     List<WeightLog> findByUserIdOrderByLogDateDesc(UUID id);
+    List<WeightLog> findLastByUserId(UUID id, Integer limit);
 }

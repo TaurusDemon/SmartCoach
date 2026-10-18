@@ -3,6 +3,7 @@ package com.smartcoach.backend.infrastructure.ai;
 import com.smartcoach.backend.domain.model.Exercise;
 import com.smartcoach.backend.domain.model.Routine;
 import com.smartcoach.backend.domain.model.UserProfile;
+import com.smartcoach.backend.domain.model.WeightLog;
 import com.smartcoach.backend.domain.port.AiCoachPort;
 import com.smartcoach.backend.domain.vo.ExerciseCategory;
 import com.smartcoach.backend.domain.vo.ExerciseDetails;
@@ -39,5 +40,10 @@ public class MockAiAdapter implements AiCoachPort {
                 ));
 
         return new Routine(UUID.randomUUID(), userProfile.getUserId(),routineTitle, RoutineGoal.HYPERTROPHY,exerciseList, LocalDateTime.now());
+    }
+
+    @Override
+    public Routine updateRoutine(Routine routine, UserProfile userProfile, List<WeightLog> weightLogHistory, String additionalPreferences) {
+        return null;
     }
 }

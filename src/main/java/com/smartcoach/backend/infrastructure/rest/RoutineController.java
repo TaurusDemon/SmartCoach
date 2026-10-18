@@ -3,6 +3,7 @@ package com.smartcoach.backend.infrastructure.rest;
 import com.smartcoach.backend.application.usecase.CreateRoutineUseCase;
 import com.smartcoach.backend.application.usecase.GenerateWorkoutRoutineUseCase;
 import com.smartcoach.backend.application.usecase.GetRoutinesByUserIdCase;
+import com.smartcoach.backend.application.usecase.UpdateWorkoutRoutineUseCase;
 import com.smartcoach.backend.domain.model.Routine;
 import com.smartcoach.backend.infrastructure.rest.dto.*;
 import com.smartcoach.backend.infrastructure.security.AuthenticatedUser;
@@ -30,11 +31,13 @@ public class RoutineController {
     private final CreateRoutineUseCase createRoutineUseCase;
     private final GetRoutinesByUserIdCase getRoutinesByUserIdCase;
     private final GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase;
+    private final UpdateWorkoutRoutineUseCase updateWorkoutRoutineUseCase;
 
-    public RoutineController(CreateRoutineUseCase createRoutineUseCase, GetRoutinesByUserIdCase getRoutinesByUserIdCase, GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase) {
+    public RoutineController(CreateRoutineUseCase createRoutineUseCase, GetRoutinesByUserIdCase getRoutinesByUserIdCase, GenerateWorkoutRoutineUseCase generateWorkoutRoutineUseCase, UpdateWorkoutRoutineUseCase updateWorkoutRoutineUseCase) {
         this.createRoutineUseCase = createRoutineUseCase;
         this.getRoutinesByUserIdCase = getRoutinesByUserIdCase;
         this.generateWorkoutRoutineUseCase = generateWorkoutRoutineUseCase;
+        this.updateWorkoutRoutineUseCase = updateWorkoutRoutineUseCase;
     }
 
     @PostMapping
@@ -69,6 +72,13 @@ public class RoutineController {
         return ResponseEntity.status(HttpStatus.OK).body(routineResponseList);
     }
 
+    @Operation(summary = "Generar con IA una rutina en base al perfil del usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Rutina creada satisfactoriamente",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoutineResponse.class)))),
+            @ApiResponse(responseCode = "401", description = "No autorizado - Token JWT inválido o ausente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
     @PostMapping("/generate")
     public ResponseEntity<RoutineResponse> generateRoutine(@RequestBody(required = false) String additionalPreferences) {
 
@@ -76,5 +86,23 @@ public class RoutineController {
         RoutineResponse response = RoutineResponse.fromDomain(routine);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Actualiza con IA una rutina en base al perfil del usuario y su historial de peso")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Rutina actualizada satisfactoriamente",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoutineResponse.class)))),
+            @ApiResponse(responseCode = "401", description = "No autorizado - Token JWT inválido o ausente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @PostMapping("/update/{routineId}")
+    public ResponseEntity<RoutineResponse> updateRoutine(@PathVariable UUID routineId, @RequestBody(required = false) String additionalPreferences) {
+
+         Routine routine = updateWorkoutRoutineUseCase.execute(AuthenticatedUser.getAuthenticatedUserId(), routineId, additionalPreferences);
+         RoutineResponse response = RoutineResponse.fromDomain(routine);
+
+         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+
     }
 }
