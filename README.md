@@ -22,6 +22,7 @@ Funcional y testeado:
 - ✅ Perfil físico del usuario (edad, peso, altura, actividad, objetivo)
 - ✅ Creación manual de rutinas y generación con IA (`POST /api/v1/routines/generate`)
 - ✅ Historial de rutinas y registro de pesajes
+- ✅ Actualización con IA de rutinas en base a historial de pesajes (`POST /api/v1/routines/update/{routineId}`)
 - ✅ Manejo global de errores (400 / 401 / 403 / 404 / 409)
 - 🔲 Nutrición (en la hoja de ruta, aún no implementado)
 
@@ -86,6 +87,7 @@ Todos bajo `/api/v1`. Solo `auth` es pública:
 | POST   | `/routines`          | Crear rutina manual                  |
 | GET    | `/routines`          | Rutinas del usuario autenticado      |
 | POST   | `/routines/generate` | Generar rutina con IA (body opcional con preferencias) |
+| POST   | `/routines/udate/{routineId}` | Actualizar rutina con IA (body opcional con preferencias) teniendo en cuenta hostorial de pesos |
 
 ### Pesajes (autenticado)
 
