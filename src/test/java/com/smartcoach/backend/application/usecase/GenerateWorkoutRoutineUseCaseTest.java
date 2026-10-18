@@ -182,9 +182,6 @@ class GenerateWorkoutRoutineUseCaseTest {
         verify(routineRepository, times(1)).save(rutinaGeneradaPorIa);
     }
 
-    /**
-     * Helpers de arrastre: entidades de dominio REALES (nunca mockeadas).
-     */
     private UserProfile perfilValido(UUID userId) {
         return new UserProfile(userId, new Age(28), new Weight(75.5), new Height(178),
                 ActivityLevel.MODERATE, FitnessGoal.MUSCLE_GAIN);

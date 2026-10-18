@@ -199,7 +199,7 @@ class UpdateUserCaseTest {
         // Act & Assert (When & Then)
         assertThatThrownBy(() -> updateUserCase.execute(userId,targetId, "USER", "Carlos", "carlos@ejemplo.com", "corta"))
                 .isInstanceOf(ForbiddenOperationException.class)
-                .hasMessageContaining("No tienes permisos para hacer esta operacion");
+                .hasMessageContaining("No tienes permisos para hacer esta operación");
 
         verify(userRepository, never()).save(any(User.class));
     }

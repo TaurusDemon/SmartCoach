@@ -32,6 +32,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registro del usuario", description = "Registro de un usuario con nombre, email y contraseña")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario registrado exitosamente",
+                    content = @Content(schema = @Schema(implementation = UserResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Formato de datos o email inválido",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
     public ResponseEntity<UserResponse> register(@RequestBody @Valid RegisterUserRequest registerUserRequest){
         User user = registerUserCase.execute(registerUserRequest.name(), registerUserRequest.email(), registerUserRequest.password());
 

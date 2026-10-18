@@ -1,5 +1,6 @@
 package com.smartcoach.backend.application.usecase;
 
+import com.smartcoach.backend.domain.exception.ForbiddenOperationException;
 import com.smartcoach.backend.domain.exception.RoutineNotFoundException;
 import com.smartcoach.backend.domain.exception.UserProfileNotFoundException;
 import com.smartcoach.backend.domain.exception.WeightLogNotFoundException;
@@ -29,8 +30,11 @@ public class UpdateWorkoutRoutineUseCase {
 
     public Routine execute(UUID userId, UUID routineId, String additionalPreferences){
 
-        if (routineRepository.findById(routineId).isEmpty()){
-            throw new RoutineNotFoundException(userId);
+        Routine routineExistente = routineRepository.findById(routineId)
+                .orElseThrow(() -> new RoutineNotFoundException(routineId));
+
+        if(!routineExistente.getUserId().equals(userId)){
+            throw new ForbiddenOperationException();
         }
         if (weightLogRepository.findByUserIdOrderByLogDateDesc(userId).isEmpty()){
             throw new WeightLogNotFoundException(userId);
@@ -38,7 +42,7 @@ public class UpdateWorkoutRoutineUseCase {
 
         UserProfile userProfile = userProfileRepository.findByUserId(userId).orElseThrow(()-> new UserProfileNotFoundException(userId));
         List<WeightLog> weightLogHistory = weightLogRepository.findLastByUserId(userId, 10);
-        Routine routine = aiCoachPort.updateRoutine(routineRepository.findById(routineId).get(), userProfile, weightLogHistory, additionalPreferences);
+        Routine routine = aiCoachPort.updateRoutine(routineExistente, userProfile, weightLogHistory, additionalPreferences);
 
         return routineRepository.save(routine);
 

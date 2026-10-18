@@ -30,8 +30,6 @@
 		<java.version>17</java.version>
 	</properties>
 
-	<!-- BOM de Spring AI: aporta la versión del starter de Google Gemini
-	     (Spring Boot 4.1.1 NO gestiona Spring AI, vive en su propio BOM) -->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -45,6 +43,7 @@
 	</dependencyManagement>
 
 	<dependencies>
+
 		<!-- Spring Boot Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

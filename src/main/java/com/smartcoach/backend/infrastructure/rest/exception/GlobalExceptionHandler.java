@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
     // 1. Captura la regla de negocio: Usuario/Email ya existente -> 409 CONFLICT
     @ExceptionHandler(UserAlreadyExistsExpection.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsExpection(UserAlreadyExistsExpection ex) {
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsExpection ex) {
         ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
