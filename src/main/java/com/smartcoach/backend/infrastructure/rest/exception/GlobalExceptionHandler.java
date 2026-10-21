@@ -1,9 +1,6 @@
 package com.smartcoach.backend.infrastructure.rest.exception;
 
-import com.smartcoach.backend.domain.exception.ForbiddenOperationException;
-import com.smartcoach.backend.domain.exception.UserAlreadyExistsExpection;
-import com.smartcoach.backend.domain.exception.UserNotFoundException;
-import com.smartcoach.backend.domain.exception.UserProfileNotFoundException;
+import com.smartcoach.backend.domain.exception.*;
 import com.smartcoach.backend.infrastructure.rest.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +59,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleForbiddenOperationException(ForbiddenOperationException ex) {
         ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN.value(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<ErrorResponse> handleTokenException(TokenException ex) {
+        ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED.value(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
 

@@ -1,4 +1,4 @@
 package com.smartcoach.backend.infrastructure.rest.dto;
 
-public record AuthResponse(String token) {
+public record RefreshTokenRequest(String refreshToken) {
 }

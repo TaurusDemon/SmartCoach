@@ -33,8 +33,8 @@ public class BeanConfiguration {
         return new CreateOrUpdateUserProfileCase(userRepository,userProfileRepository);
     }
     @Bean
-    public AuthenticateUserUseCase authenticateUserUseCase(UserRepository userRepository, PasswordEncoderPort passwordEncoderPort, TokenProviderPort tokenProviderPort) {
-        return new AuthenticateUserUseCase(userRepository, passwordEncoderPort, tokenProviderPort);
+    public AuthenticateUserUseCase authenticateUserUseCase(UserRepository userRepository, PasswordEncoderPort passwordEncoderPort, TokenProviderPort tokenProviderPort, RefreshTokenHasher refreshTokenHasher, RefreshTokenRepository refreshTokenRepository) {
+        return new AuthenticateUserUseCase(userRepository, passwordEncoderPort, tokenProviderPort, refreshTokenRepository, refreshTokenHasher);
     }
 
     @Bean
@@ -70,5 +70,20 @@ public class BeanConfiguration {
     @Bean
     public UpdateWorkoutRoutineUseCase updateWorkoutRoutineUseCase(RoutineRepository routineRepository, UserProfileRepository userProfileRepository, AiCoachPort aiCoachPort, WeightLogRepository weightLogRepository) {
         return new UpdateWorkoutRoutineUseCase(routineRepository,userProfileRepository,aiCoachPort,weightLogRepository);
+    }
+
+    @Bean
+    public RefreshAccessTokenUseCase refreshAccessTokenUseCase(RefreshTokenRepository refreshTokenRepository, RefreshTokenHasher refreshTokenHasher, TokenProviderPort tokenProviderPort, UserRepository userRepository) {
+        return new RefreshAccessTokenUseCase(refreshTokenRepository, refreshTokenHasher, tokenProviderPort, userRepository);
+    }
+
+    @Bean
+    public LogoutUseCase logoutUseCase(RefreshTokenRepository refreshTokenRepository, RefreshTokenHasher refreshTokenHasher) {
+        return new LogoutUseCase(refreshTokenRepository, refreshTokenHasher);
+    }
+
+    @Bean
+    public LogoutAllUseCase logoutAllUseCase(RefreshTokenRepository refreshTokenRepository) {
+        return new LogoutAllUseCase(refreshTokenRepository);
     }
 }

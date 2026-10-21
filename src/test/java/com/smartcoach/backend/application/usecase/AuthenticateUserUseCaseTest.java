@@ -1,19 +1,21 @@
 package com.smartcoach.backend.application.usecase;
 
+import com.smartcoach.backend.domain.model.RefreshToken;
 import com.smartcoach.backend.domain.model.User;
-import com.smartcoach.backend.domain.port.PasswordEncoderPort;
-import com.smartcoach.backend.domain.port.TokenProviderPort;
-import com.smartcoach.backend.domain.port.UserRepository;
+import com.smartcoach.backend.domain.port.*;
+import com.smartcoach.backend.domain.vo.AuthTokens;
 import com.smartcoach.backend.domain.vo.Email;
 import com.smartcoach.backend.domain.vo.PasswordHash;
-import com.smartcoach.backend.domain.vo.Role;
+import com.smartcoach.backend.domain.vo.TokenStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,15 +47,21 @@ class AuthenticateUserUseCaseTest {
     @Mock
     private TokenProviderPort tokenProviderPort;
 
+    @Mock
+    private RefreshTokenHasher refreshTokenHasher;
+
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
     private AuthenticateUserUseCase authenticateUserUseCase;
 
     @BeforeEach
     void setUp() {
-        authenticateUserUseCase = new AuthenticateUserUseCase(userRepository, passwordEncoderPort, tokenProviderPort);
+        authenticateUserUseCase = new AuthenticateUserUseCase(userRepository, passwordEncoderPort, tokenProviderPort, refreshTokenRepository, refreshTokenHasher);
     }
 
     @Test
-    @DisplayName("Debe retornar un token cuando el email existe y la contraseña coincide")
+    @DisplayName("Debe retornar 2 tokens cuando el email existe y la contraseña coincide")
     void deberiaRetornarUnToken_cuandoElEmailExisteYLaContrasenaCoincide() {
         // Arrange (Given)
         UUID userId = UUID.randomUUID();
@@ -61,17 +69,34 @@ class AuthenticateUserUseCaseTest {
 
         when(userRepository.findByEmail(new Email("carlos@ejemplo.com"))).thenReturn(Optional.of(usuario));
         when(passwordEncoderPort.matches("MiClaveSegura123", "contrasena123")).thenReturn(true);
-        when(tokenProviderPort.generateToken(userId, "carlos@ejemplo.com","USER")).thenReturn("jwt.firmado.valido");
+
+        when(refreshTokenHasher.hash(any(String.class))).thenReturn("RefreshTokenHasheado");
+        when(refreshTokenRepository.save(any(RefreshToken.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(tokenProviderPort.generateToken(userId, "carlos@ejemplo.com", "USER")).thenReturn("accessTokenValido");
 
         // Act (When)
-        String token = authenticateUserUseCase.execute("carlos@ejemplo.com", "MiClaveSegura123");
+        AuthTokens authToken = authenticateUserUseCase.execute("carlos@ejemplo.com", "MiClaveSegura123");
 
         // Assert (Then)
-        assertThat(token).isNotNull().isEqualTo("jwt.firmado.valido");
+        assertThat(authToken.accessToken()).isNotNull().isEqualTo("accessTokenValido");
+        // El refresh token es un UUID aleatorio generado por el SUT: valor imposible de fijar, pero si relleno.
+        assertThat(authToken.refreshToken()).isNotBlank();
+
+
+        ArgumentCaptor<RefreshToken> refreshTokenCaptor = ArgumentCaptor.forClass(RefreshToken.class);
+        verify(refreshTokenRepository, times(1)).save(refreshTokenCaptor.capture());
+        RefreshToken persistido = refreshTokenCaptor.getValue();
+        assertThat(persistido.getHashToken()).isEqualTo("RefreshTokenHasheado");
+        assertThat(persistido.getHashToken()).isNotEqualTo(authToken.refreshToken());
+        assertThat(persistido.getUserId()).isEqualTo(userId);
+        assertThat(persistido.getStatus()).isEqualTo(TokenStatus.ACTIVE);
+        assertThat(persistido.getExpiryDate()).isAfter(LocalDateTime.now());
 
         verify(passwordEncoderPort, times(1)).matches("MiClaveSegura123", "contrasena123");
-        verify(tokenProviderPort, times(1)).generateToken(userId, "carlos@ejemplo.com","USER");
-        // Una sola consulta: el SUT resuelve con Optional.orElseThrow (sin doble findByEmail).
+        verify(tokenProviderPort, times(1)).generateToken(userId, "carlos@ejemplo.com", "USER");
+        verify(refreshTokenHasher, times(1)).hash(any(String.class));
+
         verify(userRepository, times(1)).findByEmail(new Email("carlos@ejemplo.com"));
     }
 

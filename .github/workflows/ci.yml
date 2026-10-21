@@ -1,4 +1,4 @@
-name: SmartCoach CI - Build & Test
+ name: SmartCoach CI - Build & Test
 
 on:
   push:
